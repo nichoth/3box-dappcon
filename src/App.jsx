@@ -4,7 +4,11 @@ import {
   Route,
   withRouter
 } from 'react-router-dom';
+
+
 // Step 1 - import 3Box library here
+import Box from '3box'
+
 
 import { TopicManagerABI } from './utils/constants';
 
@@ -47,15 +51,18 @@ class App extends Component {
     this.getChatContractAndTopics();
 
     // Step 1 - add getProfile call
-    const myProfile = {}
+    const myProfile = await Box.getProfile(myAddress);
 
     // Step 2 - authenticate user and space
-    const box = 'authenticate 3box here'
     // await onSyncDone
+    const box = await Box.openBox(myAddress, window.ethereum, {})
+    await box.syncDone
 
     // open 3chat space
-    const chatSpace = 'the chat space'
-    const myDid = 'myDID'
+
+    const chatSpace = await box.openSpace('3chat')
+    const myDid = chatSpace.DID;
+
 
     // set all to state and continue
     this.setState({ box, chatSpace, myDid, myProfile, myAddress });

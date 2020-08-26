@@ -59,14 +59,20 @@ class Chat extends Component {
     topicManager.getOwner(topic, (err, owner) => {
       topicManager.getMembers(topic, async (err, members) => {
         // Step 3 - join Thread
-        const thread = 'the thread'
+        // const thread = 'the thread'
+        const thread = await chatSpace.joinThread(topic, {
+          firstModerator: owner,
+          members
+        });
         openTopics[topic] = thread;
         this.setState({ activeTopic: openTopics[topic] });
 
         this.updateThreadPosts();
         this.updateThreadCapabilities();
-        // Step 3 - add listener functions
 
+        // Step 3 - add listener functions
+        thread.onUpdate(() => this.updateThreadPosts());
+        thread.onNewCapabilities(() => this.updateThreadCapabilities());
       })
     })
   }
@@ -77,7 +83,7 @@ class Chat extends Component {
 
     let threadData = []
     // Step 3 - get posts in thread
-    const posts = []
+    const posts = await activeTopic.getPosts();
     threadData.push(...posts)
     this.setState({ threadData });
   }
@@ -88,14 +94,14 @@ class Chat extends Component {
     // add thread members to state
     let threadMemberList = [];
     // Step 4 - members of thread
-    const members = []
+    const members = await activeTopic.listMembers();
     threadMemberList.push(...members)
     this.setState({ threadMemberList });
 
     // add thread mods to state
     let threadModeratorList = [];
     // Step 4 - moderators of thread
-    const moderators = []
+    const moderators = await activeTopic.listModerators();
     threadModeratorList.push(...moderators)
     this.setState({ threadModeratorList });
   }
